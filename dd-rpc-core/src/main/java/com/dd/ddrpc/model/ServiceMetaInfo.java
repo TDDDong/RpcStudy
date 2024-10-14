@@ -1,7 +1,7 @@
 package com.dd.ddrpc.model;
 
 import cn.hutool.core.util.StrUtil;
-import com.yupi.yurpc.constant.RpcConstant;
+import com.dd.ddrpc.constant.RpcConstant;
 import lombok.Data;
 
 /**

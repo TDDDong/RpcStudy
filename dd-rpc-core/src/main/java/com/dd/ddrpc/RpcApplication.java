@@ -4,6 +4,7 @@ import com.dd.ddrpc.config.RegistryConfig;
 import com.dd.ddrpc.config.RpcConfig;
 import com.dd.ddrpc.constant.RpcConstant;
 import com.dd.ddrpc.register.Registry;
+import com.dd.ddrpc.register.RegistryFactory;
 import com.dd.ddrpc.utils.ConfigUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,8 +29,8 @@ public class RpcApplication {
         log.info("rpc init, config = {}", newRpcConfig.toString());
         //注册中心初始化
         RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
-        //TODO 通过注册中心类别获取对应的注册中心 并调用init方法进行初始化
-        Registry registry = null;
+        //通过注册中心类别获取对应的注册中心 并调用init方法进行对应注册中心初始化
+        Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());
         registry.init(registryConfig);
         log.info("registry init, config = {}", registryConfig);
         //创建并注册 Shutdown Hook, JVM退出时执行操作

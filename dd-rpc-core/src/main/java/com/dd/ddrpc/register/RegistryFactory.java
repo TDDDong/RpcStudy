@@ -16,7 +16,7 @@ public class RegistryFactory {
      * 默认注册中心
      */
     //TODO 待完成两种注册中心实现类编写后补充
-    private static final Registry DEFAULT_REGISTRY = null;
+    private static final Registry DEFAULT_REGISTRY = new ZooKeeperRegistry();
 
     /**
      * 获取实例
