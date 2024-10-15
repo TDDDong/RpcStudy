@@ -36,6 +36,10 @@ public class ZooKeeperRegistry implements Registry{
      * 注册中心服务缓存
      */
     private final RegistryServiceCache registryServiceCache = new RegistryServiceCache();
+    /**
+     * 注册中心服务缓存 （支持多个服务）
+     */
+    private final RegistryServiceMultiCache registryServiceMultiCache = new RegistryServiceMultiCache();
 
     /**
      * 正在监听的 key 集合
@@ -95,11 +99,12 @@ public class ZooKeeperRegistry implements Registry{
     @Override
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
         //优先从缓存中获取服务
+        //只支持单个服务
+        //List<ServiceMetaInfo> cacheServiceMetaInfoList = registryServiceCache.readCache();
         /**
-         * 旧代码存在问题：一次返回所有本地缓存服务信息
-         * 应该根据对应的服务名称获取对应的缓存信息
+         * 支持多个服务
          */
-        List<ServiceMetaInfo> cacheServiceMetaInfoList = registryServiceCache.readCache(serviceKey);
+        List<ServiceMetaInfo> cacheServiceMetaInfoList = registryServiceMultiCache.readCache(serviceKey);
         if (cacheServiceMetaInfoList != null) {
             return cacheServiceMetaInfoList;
         }
@@ -114,7 +119,7 @@ public class ZooKeeperRegistry implements Registry{
                     .collect(Collectors.toList());
 
             //写入服务缓存
-            registryServiceCache.writeCache(serviceKey, serviceMetaInfoList);
+            registryServiceCache.writeCache(serviceMetaInfoList);
             return serviceMetaInfoList;
         } catch (Exception e) {
             throw new RuntimeException("获取服务列表失败", e);
@@ -137,12 +142,24 @@ public class ZooKeeperRegistry implements Registry{
         if (newWatch) {
             CuratorCache curatorCache = CuratorCache.build(client, watchKey);
             curatorCache.start();
+            /**
+             * serviceNodeKey 拼接规则： String.format("%s/%s:%s", getServiceKey(), serviceHost, servicePort)
+             */
+            String serviceKey = serviceNodeKey.split("/")[0];
             curatorCache.listenable().addListener(
                     CuratorCacheListener
                             .builder()
-                            //TODO 删除对应节点的缓存
-                            .forDeletes(childData -> registryServiceCache.clearCache())
-                            .forChanges((oldNode, node) -> registryServiceCache.clearCache())
+                            /**
+                             * 以下只支持单个服务
+                             */
+                            //.forDeletes(childData -> registryServiceCache.clearCache())
+                            //.forChanges(((oldNode, node) -> registryServiceCache.clearCache()))
+                            /**
+                             * 以下支持多个服务
+                             */
+                            //这里的serviceNodeKey要拆分取到serviceKey
+                            .forDeletes(childData -> registryServiceMultiCache.clearCache(serviceKey))
+                            .forChanges((oldNode, node) -> registryServiceMultiCache.clearCache(serviceKey))
                             .build()
             );
         }

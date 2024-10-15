@@ -15,7 +15,7 @@ public class RpcConfig {
     /**
      * 名称
      */
-    private String name = "yu-rpc";
+    private String name = "dd-rpc";
 
     /**
      * 版本号

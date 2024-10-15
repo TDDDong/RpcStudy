@@ -15,8 +15,9 @@ public class RegistryConfig {
 
     /**
      * 注册中心类别
+     * 根据该参数获取对应的实现类并进行初始化
      */
-    private String registry = RegistryKeys.ETCD;
+    private String registry = RegistryKeys.ZOOKEEPER;
 
     /**
      * 注册中心地址
