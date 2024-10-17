@@ -1,7 +1,6 @@
 package com.dd.ddrpc.proxy;
 
 import com.dd.ddrpc.RpcApplication;
-import com.dd.ddrpc.config.RpcConfig;
 
 import java.lang.reflect.Proxy;
 
