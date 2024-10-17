@@ -1,6 +1,6 @@
 package com.dd.ddrpc.model;
 
-import com.yupi.yurpc.constant.RpcConstant;
+import com.dd.ddrpc.constant.RpcConstant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
