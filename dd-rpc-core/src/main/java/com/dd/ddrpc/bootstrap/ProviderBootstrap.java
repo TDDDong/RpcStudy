@@ -7,6 +7,7 @@ import com.dd.ddrpc.model.ServiceRegisterInfo;
 import com.dd.ddrpc.register.LocalRegistry;
 import com.dd.ddrpc.register.Registry;
 import com.dd.ddrpc.register.RegistryFactory;
+import com.dd.ddrpc.service.tcp.VertxTcpServer;
 
 import java.util.List;
 
@@ -45,7 +46,8 @@ public class ProviderBootstrap {
             }
         }
 
-        // TODO 启动服务器
-
+        //启动服务器
+        VertxTcpServer vertxTcpServer = new VertxTcpServer();
+        vertxTcpServer.doStart(rpcConfig.getServerPort());
     }
 }
