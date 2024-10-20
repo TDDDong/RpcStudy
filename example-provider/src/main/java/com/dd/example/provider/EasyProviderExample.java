@@ -1,7 +1,7 @@
 package com.dd.example.provider;
 
-import com.dd.ddrpc.registry.LocalRegistry;
-import com.dd.ddrpc.server.VertxHttpServer;
+import com.dd.ddrpc.register.LocalRegistry;
+import com.dd.ddrpc.service.VertxHttpServer;
 import com.dd.example.common.service.UserService;
 
 /**
