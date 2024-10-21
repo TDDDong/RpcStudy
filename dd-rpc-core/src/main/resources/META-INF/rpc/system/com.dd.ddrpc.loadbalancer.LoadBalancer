@@ -1,0 +1,3 @@
+roundRobin=com.dd.ddrpc.loadbalancer.RoundRobinLoadBalancer
+random=com.dd.ddrpc.loadbalancer.RandomLoadBalancer
+consistentHash=com.dd.ddrpc.loadbalancer.ConsistentHashLoadBalancer
