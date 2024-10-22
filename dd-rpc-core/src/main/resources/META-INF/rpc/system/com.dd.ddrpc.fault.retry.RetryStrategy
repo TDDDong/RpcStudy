@@ -1,0 +1,2 @@
+no=com.dd.ddrpc.fault.retry.NoRetryStrategy
+fixedInterval=com.dd.ddrpc.fault.retry.FixedIntervalRetryStrategy

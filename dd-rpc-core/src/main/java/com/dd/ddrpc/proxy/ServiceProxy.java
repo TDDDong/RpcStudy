@@ -9,6 +9,8 @@ import com.dd.ddrpc.config.RpcConfig;
 import com.dd.ddrpc.constant.RpcConstant;
 import com.dd.ddrpc.fault.retry.RetryStrategy;
 import com.dd.ddrpc.fault.retry.RetryStrategyFactory;
+import com.dd.ddrpc.fault.tolerant.TolerantStrategy;
+import com.dd.ddrpc.fault.tolerant.TolerantStrategyFactory;
 import com.dd.ddrpc.loadbalancer.LoadBalancer;
 import com.dd.ddrpc.loadbalancer.LoadBalancerFactory;
 import com.dd.ddrpc.model.RpcRequest;
@@ -53,8 +55,7 @@ public class ServiceProxy implements InvocationHandler {
         }
 
         RpcRequest rpcRequest = RpcRequest.builder().methodName(method.getName()).build();
-        Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
-        byte[] bodyBytes = serializer.serialize(rpcRequest);
+
         //由负载均衡器选择出对应的服务
         LoadBalancer loadBalancer = LoadBalancerFactory.getInstance(rpcConfig.getLoadBalancer());
         // 将调用方法名（请求路径）作为负载均衡参数
@@ -68,11 +69,13 @@ public class ServiceProxy implements InvocationHandler {
             RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
             retryStrategy.doRetry(() -> VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo));
         } catch (Exception e) {
-            //TODO 容错机制 后续补充
-            e.printStackTrace();
-            rpcResponse = null;
+            // 容错机制
+            TolerantStrategy tolerantStrategy = TolerantStrategyFactory.getInstance(rpcConfig.getTolerantStrategy());
+            rpcResponse = tolerantStrategy.doTolerant(null, e);
         }
-        //RpcResponse rpcResponse = doHttpRequest(selectedServiceMetaInfo, bodyBytes);
+        /*Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
+        byte[] bodyBytes = serializer.serialize(rpcRequest);
+        RpcResponse rpcResponse = doHttpRequest(selectedServiceMetaInfo, bodyBytes);*/
         return rpcResponse.getData();
     }
 

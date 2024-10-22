@@ -1,6 +1,7 @@
 package com.dd.ddrpc.config;
 
 import com.dd.ddrpc.fault.retry.RetryStrategyKeys;
+import com.dd.ddrpc.fault.tolerant.TolerantStrategyKeys;
 import com.dd.ddrpc.loadbalancer.LoadBalancerKeys;
 import com.dd.ddrpc.serializer.SerializerKeys;
 import lombok.Data;
@@ -53,7 +54,7 @@ public class RpcConfig {
     /**
      * 容错策略
      */
-    //private String tolerantStrategy = TolerantStrategyKeys.FAIL_FAST;
+    private String tolerantStrategy = TolerantStrategyKeys.FAIL_FAST;
 
     /**
      * 模拟调用

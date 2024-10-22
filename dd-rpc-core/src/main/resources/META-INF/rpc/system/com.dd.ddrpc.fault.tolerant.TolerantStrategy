@@ -1,0 +1,4 @@
+failBack=com.dd.ddrpc.fault.tolerant.FailBackTolerantStrategy
+failFast=com.dd.ddrpc.fault.tolerant.FailFastTolerantStrategy
+failOver=com.dd.ddrpc.fault.tolerant.FailOverTolerantStrategy
+failSafe=com.dd.ddrpc.fault.tolerant.FailSafeTolerantStrategy

@@ -10,7 +10,7 @@ public class RetryStrategyFactory {
         SpiLoader.load(RetryStrategy.class);
     }
 
-    private static final RetryStrategy DEFAULT_RETRY_STRATEGY = null;
+    private static final RetryStrategy DEFAULT_RETRY_STRATEGY = new NoRetryStrategy();
 
     /**
      * 获取实例
