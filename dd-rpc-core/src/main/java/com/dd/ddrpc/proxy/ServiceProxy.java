@@ -7,6 +7,8 @@ import cn.hutool.http.HttpUtil;
 import com.dd.ddrpc.RpcApplication;
 import com.dd.ddrpc.config.RpcConfig;
 import com.dd.ddrpc.constant.RpcConstant;
+import com.dd.ddrpc.fault.retry.RetryStrategy;
+import com.dd.ddrpc.fault.retry.RetryStrategyFactory;
 import com.dd.ddrpc.loadbalancer.LoadBalancer;
 import com.dd.ddrpc.loadbalancer.LoadBalancerFactory;
 import com.dd.ddrpc.model.RpcRequest;
@@ -16,6 +18,7 @@ import com.dd.ddrpc.register.Registry;
 import com.dd.ddrpc.register.RegistryFactory;
 import com.dd.ddrpc.serializer.Serializer;
 import com.dd.ddrpc.serializer.SerializerFactory;
+import com.dd.ddrpc.service.tcp.VertxTcpClient;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -48,7 +51,7 @@ public class ServiceProxy implements InvocationHandler {
         if (CollUtil.isEmpty(serviceMetaInfoList)) {
             throw new RuntimeException("暂无服务地址");
         }
-        //TODO 重试机制 容错机制 后续补充
+
         RpcRequest rpcRequest = RpcRequest.builder().methodName(method.getName()).build();
         Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
         byte[] bodyBytes = serializer.serialize(rpcRequest);
@@ -58,7 +61,18 @@ public class ServiceProxy implements InvocationHandler {
         Map<String, Object> requestParams = new HashMap<>();
         requestParams.put("methodName", rpcRequest.getMethodName());
         ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
-        RpcResponse rpcResponse = doHttpRequest(selectedServiceMetaInfo, bodyBytes);
+        //rpc请求
+        //使用重试机制
+        RpcResponse rpcResponse = null;
+        try {
+            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+            retryStrategy.doRetry(() -> VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo));
+        } catch (Exception e) {
+            //TODO 容错机制 后续补充
+            e.printStackTrace();
+            rpcResponse = null;
+        }
+        //RpcResponse rpcResponse = doHttpRequest(selectedServiceMetaInfo, bodyBytes);
         return rpcResponse.getData();
     }
 
